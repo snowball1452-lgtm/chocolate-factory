@@ -1,0 +1,43 @@
+version: "3.9"
+
+# ============================================================
+# CHOCOLATE FACTORY — Quickstart (2 containers, ~10s startup)
+# Just the core: policy compiler + taste engine + local LLM.
+# Use docker-compose.full.yml for the 10-service stack.
+# ============================================================
+
+networks:
+  factory:
+    driver: bridge
+
+services:
+
+  # ── The Factory (compiler + taste engine API) ────────────
+  factory:
+    build: ./quickstart
+    container_name: cf-factory
+    ports: ["8000:8000"]
+    networks: [factory]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  # ── Ollama (local model inference) ────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: cf-ollama-lite
+    ports: ["11434:11434"]
+    volumes: ["ollama-models:/root/.ollama"]
+    networks: [factory]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  ollama-models:

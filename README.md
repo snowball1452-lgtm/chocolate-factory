@@ -3,6 +3,39 @@
 > A self-hosted, open-source autonomous AI system for play, exploration, and discovery.
 > If Willy Wonka built an agent system, this would be it.
 
+
+## Quickstart (2 containers, ~10s)
+
+```bash
+# One-liner from GitHub:
+curl -fsSL https://raw.githubusercontent.com/snowball1452-lgtm/chocolate-factory/main/quickstart/deploy.sh | bash
+
+# Or if you've cloned:
+docker compose -f docker-compose.quickstart.yml up -d
+```
+
+This starts just the core — the policy compiler + taste engine API (FastAPI on :8000)
+and Ollama for local model inference (:11434). Two containers, no external dependencies.
+
+```bash
+# Test it:
+curl -X POST http://localhost:8000/compile \
+  -H "Content-Type: application/json" \
+  -d '{"sources": {"organization": "/models/allowed = [\"kimi-k2.6\"]"}}'
+
+# Interactive API docs:
+open http://localhost:8000/docs
+```
+
+## Full Stack (10 containers)
+
+```bash
+cd orchestration
+cp .env.example .env  # Add your API keys
+./factory-up.sh        # Start everything
+./factory-status.sh    # Health check
+```
+
 ## What's Here
 
 ### `composition-algebra.md` — The Specification (v2.1.0)
